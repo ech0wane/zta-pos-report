@@ -26,14 +26,11 @@
 
 #### ۲. تعریف سیاست های فیلترینگ لایه اپلیکیشن (Policy Definition Application Layer)
 
-1. ‍‍`IF Subject=POS_Terminal AND Posture=Healthy AND Protocol=POS_Payment_v2_API THEN Access=Allow`
-2. `IF Subject=POS_Terminal AND Action=Scan_Network THEN Access=Deny AND Log_Alert` (جلوگیری از شناسایی شبکه توسط بدافزار)
-3. `IF Subject=POS_Terminal AND Destination!=Transaction_Server_IP THEN Access=Block` (محدودسازی دقیق مقصد)
-4. `IF Subject=POS_Terminal AND Location=Outside_Store_Geofence THEN Access=Revoke` (اگر دستگاه از محدوده فروشگاه خارج شد، دسترسی قطع شود) 
-5. `IF Subject=POS_Terminal AND Behavior=Anomalous_Traffic_Volume THEN Access=Re-evaluate` (اگر حجم ترافیک غیرعادی بود، PE باید دسترسی را مجدداً بررسی کند)
-6. `IF Subject=POS_Terminal AND Destination_URL != https://transactions.re.com/api/v1 THEN Access=Block`
-7. `IF Subject=POS_Terminal AND Command=SYSTEM_SHUTDOWN THEN Access=Deny AND Trigger_Alert`
-8. `IF Subject=POS_Terminal AND Payload_Encryption=Invalid THEN Access=Block`
+1. `IF Subject=POS_Terminal AND API_Version < v3.0 THEN Access=Deny`
+2. `IF Subject=POS_Terminal AND HTTP_Method != POST AND URI=/checkout THEN Access=Block`
+3. `IF Subject=POS_Terminal AND Payload_Contains=Cleartext_Credit_Card THEN Access=Block AND Log_Alert`
+4. `IF Subject=POS_Terminal AND Auth_Token=Expired THEN Access=Deny AND Request_Reauth`
+5. `IF Subject=POS_Terminal AND HTTP_User_Agent != "RetailPOS_App_v2" THEN Access=Drop`
 
 
 
